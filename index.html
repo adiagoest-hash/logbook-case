@@ -157,6 +157,8 @@ var cases=[];          // [{_id, idCase, ...}]
 var db=null, col=null; // shared storage (null = local mode)
 var editing=null;      // _id being edited
 var downloads=null;
+var SHEETS_URL="https://script.google.com/macros/s/AKfycbyQMcIE85QuFfDw2jJkEEU7pNfdgnxpgE8HErZBwVXno34akPsJfYw09JeOMPhew8hw/exec";
+var sheets=false, sheetUrl="", sheetCode="";
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -185,12 +187,42 @@ function lsGet(){try{return JSON.parse(localStorage.getItem("logbook-cases")||"[
 function lsSet(){try{localStorage.setItem("logbook-cases",JSON.stringify(cases))}catch(e){}}
 function strip(c){var o=Object.assign({},c);delete o._id;return o}
 
+function getCode(force){
+  if(force)sheetCode="";
+  if(!sheetCode){try{sheetCode=localStorage.getItem("logbook-code")||""}catch(e){}}
+  if(!sheetCode){sheetCode=(window.prompt("Masukkan kode akses tim (minta ke admin):")||"").trim();if(sheetCode){try{localStorage.setItem("logbook-code",sheetCode)}catch(e){}}}
+  return sheetCode;
+}
+async function sheetsList(){
+  var r=await fetch(SHEETS_URL+"?code="+encodeURIComponent(getCode()));
+  var j=await r.json();
+  if(!j.ok){if(/kode/i.test(j.error||"")){try{localStorage.removeItem("logbook-code")}catch(e){}sheetCode=""}throw new Error(j.error||"gagal")}
+  sheetUrl=j.sheetUrl||sheetUrl;
+  return j.cases||[];
+}
+async function sheetsPost(body){
+  body.code=getCode();
+  var r=await fetch(SHEETS_URL,{method:"POST",body:JSON.stringify(body)});
+  var j=await r.json();
+  if(!j.ok){if(/kode/i.test(j.error||"")){try{localStorage.removeItem("logbook-code")}catch(e){}sheetCode=""}throw new Error(j.error||"gagal")}
+}
+async function sheetsRefresh(quiet){
+  try{
+    cases=await sheetsList();
+    $("banner").innerHTML=sheetUrl?'<div class="banner" style="background:#e8f5e9;color:#1b5e20;border-color:#b7dfb9">Terhubung ke penyimpanan bersama (Google Sheets). Data terlihat oleh semua yang punya kode. <a href="'+esc(sheetUrl)+'" target="_blank" rel="noopener">Buka Sheet</a></div>':"";
+    renderAll();
+  }catch(err){
+    if(!quiet)$("banner").innerHTML='<div class="banner">Gagal memuat data bersama: '+esc(err&&err.message||err)+'. Muat ulang halaman dan masukkan kode yang benar.</div>';
+  }
+}
 async function saveCase(c){
-  if(col){await col.doc(c._id).set(strip(c));}
+  if(sheets){await sheetsPost({action:"save",case:c});var i0=cases.findIndex(function(x){return x._id===c._id});if(i0>=0)cases[i0]=c;else cases.push(c);renderAll();sheetsRefresh(true);}
+  else if(col){await col.doc(c._id).set(strip(c));}
   else{var i=cases.findIndex(function(x){return x._id===c._id});if(i>=0)cases[i]=c;else cases.push(c);lsSet();renderAll();}
 }
 async function removeCase(id){
-  if(col){await col.doc(id).delete();}
+  if(sheets){await sheetsPost({action:"delete",id:id});cases=cases.filter(function(x){return x._id!==id});renderAll();sheetsRefresh(true);}
+  else if(col){await col.doc(id).delete();}
   else{cases=cases.filter(function(x){return x._id!==id});lsSet();renderAll();}
 }
 function nextId(){
@@ -370,6 +402,12 @@ $("banner").innerHTML='<div class="banner">Menghubungkan ke penyimpanan bersamaâ
 (async function(){
   try{downloads=await claude.use("downloads")}catch(e){downloads=null}
   try{db=await claude.use("db")}catch(e){db=null}
+  if(!db&&SHEETS_URL){
+    sheets=true;cases=[];
+    await sheetsRefresh(false);
+    setInterval(function(){if(!document.hidden)sheetsRefresh(true)},20000);
+    return;
+  }
   if(!db){
     $("banner").innerHTML='<div class="banner">Mode lokal: data hanya tersimpan di browser ini dan tidak terlihat oleh orang lain.</div>';
     return;
