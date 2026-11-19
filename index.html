@@ -1,0 +1,391 @@
+TEST<b>&</b>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logbook Issue / Case</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--ink:#1c2430;--mut:#667085;--line:#e3e7ed;--accent:#1d5fd1;--accent-ink:#fff;
+  --ok:#157f4b;--warn:#b26a00;--bad:#c0362c;--soft:#eef3fc;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#12151a;--card:#1a1f27;--ink:#e8ecf2;--mut:#9aa5b5;--line:#2b323d;--accent:#6ea2ff;--accent-ink:#0d1624;--ok:#4cc38a;--warn:#e0a24a;--bad:#ff7b6f;--soft:#1e2838}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:18px 20px 0;max-width:1200px;margin:0 auto}
+h1{font-size:20px;margin:0 0 2px}
+.sub{color:var(--mut);font-size:13px}
+nav{display:flex;gap:4px;max-width:1200px;margin:14px auto 0;padding:0 20px;border-bottom:1px solid var(--line);overflow-x:auto}
+nav button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;font:inherit;color:var(--mut);cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--accent);border-color:var(--accent);font-weight:600}
+main{max-width:1200px;margin:0 auto;padding:18px 20px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.banner{background:#fff4e0;color:#7a4a00;border:1px solid #f0d49a;border-radius:8px;padding:8px 12px;margin-bottom:14px;font-size:13px}
+@media (prefers-color-scheme:dark){.banner{background:#3a2c10;color:#f0cf8e;border-color:#5a4418}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 14px}
+.full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:4px}
+label .req{color:var(--bad)}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:7px;padding:8px 10px}
+textarea{min-height:76px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+h2{font-size:14px;margin:18px 0 8px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+h2:first-child{margin-top:0}
+.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:7px;cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.bad{color:var(--bad);border-color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sp{flex:1}
+.msg{font-size:13px;margin-left:6px}
+.msg.ok{color:var(--ok)}.msg.err{color:var(--bad)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools input{max-width:240px}.tools select{max-width:170px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mut);background:var(--soft);position:sticky;top:0;white-space:nowrap}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--soft)}
+td.t{min-width:220px}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-si<body>
+<header>
+  <h1>Logbook Issue / Case</h1>
+  <div class="sub">Catat, pantau, dan rekap issue atau case pelanggan dalam satu tempat.</div>
+</header>
+<nav id="nav">
+  <button data-tab="form" class="on">Isi Case</button>
+  <button data-tab="list">Daftar Case</button>
+  <button data-tab="recap">Rekap &amp; Excel</button>
+</nav>
+<main>
+  <div id="banner"></div>
+
+  <section id="tab-form">
+    <form id="f" class="card" autocomplete="off">
+      <div class="row" style="margin-bottom:12px">
+        <b id="formTitle" style="font-size:16px">Case baru</b>
+        <span class="pill" id="idShow"></span>
+      </div>
+      <h2>Identitas</h2>
+      <div class="grid">
+        <div><label for="tanggalLapor">Tanggal lapor <span class="req">*</span></label><input type="date" id="tanggalLapor" required></div>
+        <div class="full"><label for="judul">Judul issue <span class="req">*</span></label><input id="judul" required placeholder="Ringkas dalam satu kalimat"></div>
+        <div><label for="kategori">Kategori <span class="req">*</span></label><select id="kategori" required></select></div>
+        <div><label for="prioritas">Prioritas <span class="req">*</span></label><select id="prioritas" required></select></div>
+        <div><label for="status">Status <span class="req">*</span></label><select id="status" required></select></div>
+        <div><label for="pic">PIC <span class="req">*</span></label><input id="pic" required placeholder="Nama penanggung jawab"></div>
+        <div><label for="pelanggan">Pelanggan / Unit</label><input id="pelanggan" placeholder="Nama pelanggan atau unit kerja"></div>
+      </div>
+      <h2>Isi case</h2>
+      <div class="grid">
+        <div class="full"><label for="deskripsi">Deskripsi &amp; kronologi</label><textarea id="deskripsi" placeholder="Apa yang terjadi, kapan, dan dampaknya"></textarea></div>
+        <div class="full"><label for="tindakan">Tindakan yang dilakukan</label><textarea id="tindakan"></textarea></div>
+      </div>
+      <h2>Penutupan</h2>
+      <div class="grid">
+        <div><label for="targetSelesai">Target selesai</label><input type="date" id="targetSelesai"></div>
+        <div><label for="tanggalSelesai">Tanggal selesai</label><input type="date" id="tanggalSelesai"></div>
+        <div class="full"><label for="rootCause">Root cause</label><textarea id="rootCause"></textarea></div>
+        <div class="full"><label for="tindakLanjut">Tindak lanjut / pencegahan</label><textarea id="tindakLanjut"></textarea></div>
+        <div class="full"><label for="catatan">Catatan</label><input id="catatan"></div>
+      </div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn pri" type="submit" id="saveBtn">Simpan case</button>
+        <button class="btn" type="button" id="resetBtn">Kosongkan form</button>
+        <button class="btn bad" type="button" id="delBtn" style="display:none">Hapus case</button>
+        <span class="msg" id="formMsg"></span>
+      </div>
+    </form>
+  </section>
+
+  <section id="tab-list" hidden>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Cari judul, pelanggan, PIC…">
+      <select id="fStatus"></select>
+      <select id="fPrio"></select><script>
+"use strict";
+var KATEGORI=["Stock/ Supply","Pengiriman/ Delivery","Kualitas Produk","Losses","Harga/ Komersial","Pembayaran/ Invoice","Kontrak/ Dokumen","Keluhan Pelanggan","Lainnya"];
+var PRIORITAS=["Rendah","Sedang","Tinggi","Kritis"];
+var STATUS=["Baru","Dalam Proses","Menunggu Pihak Lain","Selesai","Ditutup"];
+var DONE=["Selesai","Ditutup"];
+
+var cases=[];          // [{_id, idCase, ...}]
+var db=null, col=null; // shared storage (null = local mode)
+var editing=null;      // _id being edited
+var downloads=null;
+
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function dayNum(iso){if(!iso)return null;var p=iso.split("-");return Math.round(Date.UTC(+p[0],+p[1]-1,+p[2])/86400000)}
+function fmtDate(iso){if(!iso)return "";var p=iso.split("-");return p[2]+"/"+p[1]+"/"+p[0]}
+function umur(c){if(!c.tanggalLapor)return "";var end=c.tanggalSelesai||today();return dayNum(end)-dayNum(c.tanggalLapor)}
+function isOpen(c){return DONE.indexOf(c.status)<0}
+function isLate(c){return isOpen(c)&&c.targetSelesai&&c.targetSelesai<today()}
+function opts(sel,list,first){sel.innerHTML=(first?'<option value="">'+first+'</option>':'<option value="">Pilih…</option>')+list.map(function(x){return '<option>'+esc(x)+'</option>'}).join("")}
+
+/* ---------- storage ---------- */
+function docsOf(snap){
+  if(!snap)return [];
+  var arr;
+  if(Array.isArray(snap))arr=snap;
+  else if(snap.docs)arr=snap.docs;
+  else if(typeof snap.forEach==="function"){arr=[];snap.forEach(function(d){arr.push(d)})}
+  else arr=[];
+  return arr.map(function(d){
+    var data=typeof d.data==="function"?d.data():(d.data&&typeof d.data==="object"?d.data:d);
+    return Object.assign({},data,{_id:d.id||data._id||data.id});
+  });
+}
+function lsGet(){try{return JSON.parse(localStorage.getItem("logbook-cases")||"[]")}catch(e){return []}}
+function lsSet(){try{localStorage.setItem("logbook-cases",JSON.stringify(cases))}catch(e){}}
+function strip(c){var o=Object.assign({},c);delete o._id;return o}
+
+async function saveCase(c){
+  if(col){await col.doc(c._id).set(strip(c));}
+  else{var i=cases.findIndex(function(x){return x._id===c._id});if(i>=0)cases[i]=c;else cases.push(c);lsSet();renderAll();}
+}
+async function removeCase(id){
+  if(col){await col.doc(id).delete();}
+  else{cases=cases.filter(function(x){return x._id!==id});lsSet();renderAll();}
+}
+function nextId(){
+  var max=0;cases.forEach(function(c){var m=/(\d+)$/.exec(c.idCase||"");if(m)max=Math.max(max,+m[1])});
+  return "CASE-"+String(max+1).padStart(3,"0");
+}
+function newKey(){return "c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+/* ---------- form ---------- */
+var FIELDS=["tanggalLapor","judul","kategori","prioritas","status","pic","pelanggan","deskripsi","tindakan","targetSelesai","tanggalSelesai","rootCause","tindakLanjut","catatan"];
+function lastPic(){try{return localStorage.getItem("logbook-pic")||""}catch(e){return ""}}
+function resetForm(){
+  editing=null;
+  FIELDS.forEach(function(f){$(f).value=""});
+  $("tanggalLapor").value=today();
+  $("status").value="Baru";
+  $("pic").value=lastPic();
+  $("formTitle").textContent="Case baru";
+  $("idShow").textContent=nextId();
+  $("saveBtn").textContent="Simpan case";
+  $("delBtn").style.display="none";
+  $("delBtn").textContent="Hapus case";
+}
+function loadCase(c){
+  editing=c._id;
+  FIELDS.forEach(function(f){$(f).value=c[f]||""});
+  $("formTitle").textContent="Ubah case";
+  $("idShow").textContent=c.idCase||"";
+  $("saveBtn").textContent="Simpan perubahan";
+  $("delBtn").style.display="";
+  $("delBtn").textContent="Hapus case";
+  $("formMsg").textContent="";
+  showTab("form");
+  window.scrollTo(0,0);
+}
+function flash(el,text,cls){el.textContent=text;el.className="msg "+(cls||"");if(text)setTimeout(function(){if(el.textContent===text)el.textContent=""},4000)}
+
+$("f").addEventListener("submit",async function(e){
+  e.preventDefault();
+  var c={};FIELDS.forEach(function(f){c[f]=$(f).value.trim()});
+  if(c.tanggalSelesai&&c.tanggalSelesai<c.tanggalLapor){flash($("formMsg"),"Tanggal selesai tidak boleh sebelum tanggal lapor.","err");return}
+  if(c.status==="Selesai"&&!c.tanggalSelesai)c.tanggalSelesai=today();
+  var old=editing?cases.find(function(x){return x._id===editing}):null;
+  c._id=editing||newKey();
+  c.idCase=old?old.idCase:nextId();
+  c.dibuat=old&&old.dibuat?old.dibuat:new Date().toISOString();
+  c.diubah=new Date().toISOString();
+  $("saveBtn").disabled=true;
+  try{
+    await saveCase(c);
+    try{localStorage.setItem("logbook-pic",c.pic)}catch(x){}
+    flash($("formMsg"),"Tersimpan: "+c.idCase,"ok");
+    resetForm();
+  }catch(err){flash($("formMsg"),"Gagal menyimpan. Coba lagi. ("+(err&&err.message||err)+")","err")}
+  $("saveBtn").disabled=false;
+});
+$("resetBtn").addEventListener("click",function(){resetForm();$("formMsg").textContent=""});
+$("delBtn").addEventListener("click",async function(){
+  if($("delBtn").textContent!=="Yakin hapus?"){$("delBtn").textContent="Yakin hapus?";return}
+  try{await removeCase(editing);flash($("formMsg"),"Case dihapus.","ok");resetForm()}
+  catch(err){flash($("formMsg"),"Gagal menghapus. Anda mungkin hanya punya akses lihat.","err")}
+});
+
+/* ---------- list ---------- */
+function filtered(){
+  var q=$("q").value.trim().toLowerCase(),s=$("fStatus").value,p=$("fPrio").value,k=$("fKat").value;
+  return cases.filter(function(c){
+    if(s&&c.status!==s)return false;if(p&&c.prioritas!==p)return false;if(k&&c.kategori!==k)return false;
+    if(q){var h=[c.idCase,c.judul,c.pelanggan,c.pic,c.deskripsi].join(" ").toLowerCase();if(h.indexOf(q)<0)return false}
+    return true;
+  }).sort(function(a,b){return (b.tanggalLapor||"").localeCompare(a.tanggalLapor||"")||(b.idCase||"").localeCompare(a.idCase||"")});
+}
+function sClass(s){return "s-"+String(s||"").split(" ")[0]}
+function renderList(){
+  var rows=filtered();
+  $("tbody").innerHTML=rows.length?rows.map(function(c){
+    return '<tr data-id="'+esc(c._id)+'"><td>'+esc(c.idCase)+'</td><td>'+fmtDate(c.tanggalLapor)+'</td><td class="t">'+esc(c.judul)+'</td><td>'+esc(c.kategori)+'</td>'+
+      '<td><span class="pill p-'+esc(c.prioritas)+'">'+esc(c.prioritas)+'</span></td><td><span class="pill '+sClass(c.status)+'">'+esc(c.status)+'</span></td>'+
+      '<td>'+esc(c.pic)+'</td><td>'+esc(c.pelanggan)+'</td><td'+(isLate(c)?' class="late"':'')+'>'+fmtDate(c.targetSelesai)+(isLate(c)?' (lewat)':'')+'</td><td>'+umur(c)+'</td></tr>';
+  }).join(""):'<tr><td colspan="10" class="empty">'+(cases.length?"Tidak ada case yang cocok dengan filter.":"Belum ada case. Mulai dari tab Isi Case.")+'</td></tr>';
+  $("listCount").textContent=rows.length+" dari "+cases.length+" case. Klik baris untuk mengubah.";
+}
+$("tbody").addEventListener("click",function(e){
+  var tr=e.target.closest("tr[data-id]");if(!tr)return;
+  var c=cases.find(function(x){return x._id===tr.getAttribute("data-id")});if(c)loadCase(c);
+});
+["q","fStatus","fPrio","fKat"].forEach(function(id){$(id).addEventListener("input",renderList)});
+
+/* ---------- recap ---------- */
+function countBy(list,key,order){
+  var m={};list.forEach(function(c){var v=c[key]||"(kosong)";m[v]=(m[v]||0)+1});
+  var keys=order?order.filter(function(k){return m[k]}).concat(Object.keys(m).filter(function(k){return order.indexOf(k)<0})):Object.keys(m).sort(function(a,b){return m[b]-m[a]});
+  return keys.map(function(k){return [k,m[k]]});
+}
+function stats(){
+  var open=cases.filter(isOpen),done=cases.filter(function(c){return !isOpen(c)});
+  var durs=done.filter(function(c){return c.tanggalSelesai&&c.tanggalLapor}).map(umur);
+  var avg=durs.length?Math.round(durs.reduce(function(a,b){return a+b},0)/durs.length*10)/10:null;
+  return {total:cases.length,open:open.length,done:done.length,late:cases.filter(isLate).length,
+    urgent:open.filter(function(c){return c.prioritas==="Kritis"||c.prioritas==="Tinggi"}).length,avg:avg};
+}
+function renderRecap(){
+  var s=stats();
+  $("kpis").innerHTML=[["Total case",s.total],["Masih terbuka",s.open],["Selesai / ditutup",s.done],["Lewat target",s.late],["Terbuka prioritas tinggi/kritis",s.urgent],["Rata-rata hari penyelesaian",s.avg==null?"-":s.avg]]
+    .map(function(k){return '<div class="kpi"><b>'+k[1]+'</b><span>'+k[0]+'</span></div>'}).join("");
+  function block(title,pairs){
+    var max=Math.max.apply(null,pairs.map(function(p){return p[1]}).concat([1]));
+    return '<div class="card"><h2>'+title+'</h2>'+(pairs.length?pairs.map(function(p){return '<div class="bar"><span>'+esc(p[0])+'</span><i style="width:'+(p[1]/max*100)+'%"></i><span>'+p[1]+'</span></div>'}).join(""):'<div class="detail">Belum ada data.</div>')+'</div>';
+  }
+  $("dist").innerHTML=block("Per status",countBy(cases,"status",STATUS))+block("Per prioritas",countBy(cases,"prioritas",PRIORITAS))+block("Per kategori",countBy(cases,"kategori",KATEGORI))+block("Per PIC",countBy(cases,"pic"));
+}
+function sortedAll(){return cases.slice().sort(function(a,b){return (a.idCase||"").localeCompare(b.idCase||"")})}
+var HEAD=["ID Case","Tanggal Lapor","Judul Issue","Kategori","Prioritas","Status","PIC","Pelanggan / Unit","Deskripsi & Kronologi","Tindakan yang Dilakukan","Target Selesai","Tanggal Selesai","Umur Case (hari)","Root Cause","Tindak Lanjut / Pencegahan","Catatan"];
+function rowOf(c,asDate){
+  var d=function(v){return v?(asDate?new Date(v+"T00:00:00Z"):fmtDate(v)):""};
+  return [c.idCase||"",d(c.tanggalLapor),c.judul||"",c.kategori||"",c.prioritas||"",c.status||"",c.pic||"",c.pelanggan||"",c.deskripsi||"",c.tindakan||"",d(c.targetSelesai),d(c.tanggalSelesai),umur(c),c.rootCause||"",c.tindakLanjut||"",c.catatan||""];
+}
+function buildWorkbook(){
+  var all=sortedAll();
+  var ws=XLSX.utils.aoa_to_sheet([HEAD].concat(all.map(function(c){return rowOf(c,true)})),{cellDates:true});
+  [1,10,11].forEach(function(ci){for(var r=1;r<=all.length;r++){var a=XLSX.utils.encode_cell({r:r,c:ci});if(ws[a]&&ws[a].t==="d")ws[a].z="dd/mm/yyyy"}});
+  ws["!cols"]=[10,13,38,22,11,20,16,22,50,50,13,14,12,32,32,28].map(function(w){return {wch:w}});
+  ws["!autofilter"]={ref:"A1:P"+Math.max(all.length+1,2)};
+  ws["!freeze"]={xSplit:0,ySplit:1};
+  var s=stats(),rec=[["Rekap Logbook Issue / Case"],["Dibuat pada",fmtDate(today())],[],
+    ["Total case",s.total],["Masih terbuka",s.open],["Selesai / ditutup",s.done],["Lewat target",s.late],["Terbuka prioritas tinggi/kritis",s.urgent],["Rata-rata hari penyelesaian",s.avg==null?"-":s.avg]];
+  [["Per status",countBy(cases,"status",STATUS)],["Per prioritas",countBy(cases,"prioritas",PRIORITAS)],["Per kategori",countBy(cases,"kategori",KATEGORI)],["Per PIC",countBy(cases,"pic")]].forEach(function(b){
+    rec.push([],[b[0],"Jumlah"]);b[1].forEach(function(p){rec.push(p)});
+  });
+  var wr=XLSX.utils.aoa_to_sheet(rec);wr["!cols"]=[{wch:34},{wch:14}];
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Logbook");XLSX.utils.book_append_sheet(wb,wr,"Rekap");
+  return wb;
+}
+$("xlsBtn").addEventListener("click",async function(){
+  var m=$("recapMsg");
+  if(typeof XLSX==="undefined"){flash(m,"Pustaka Excel gagal dimuat. Gunakan tombol Salin tabel.","err");return}
+  var name="Logbook-Issue-Case-"+today()+".xlsx";
+  try{
+    var buf=XLSX.write(buildWorkbook(),{type:"array",bookType:"xlsx"});
+    var blob=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    if(downloads){
+      try{await downloads.save({filename:name,data:blob})}
+      catch(e1){if(e1&&/declin|cancel|reject|denied/i.test(String(e1.code||e1.message||e1)))throw e1;await downloads.save({filename:name,data:new Uint8Array(buf)})}
+    }else{
+      var url=URL.createObjectURL(blob),a=document.createElement("a");
+      a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(url)},4000);
+    }
+    flash(m,"File "+name+" siap diunduh.","ok");
+  }catch(err){flash(m,"Download tidak dilanjutkan atau gagal. Coba lagi, atau pakai Salin tabel.","err")}
+});
+$("copyBtn").addEventListener("click",async function(){
+  var cell=function(v){return String(v==null?"":v).replace(/[\t\r\n]+/g," ")};
+  var text=[HEAD].concat(sortedAll().map(function(c){return rowOf(c,false)})).map(function(r){return r.map(cell).join("\t")}).join("\n");
+  try{await navigator.clipboard.writeText(text);flash($("recapMsg"),"Tabel disalin. Tempel di Excel (Ctrl+V).","ok")}
+  catch(e){flash($("recapMsg"),"Penyalinan diblokir di tampilan ini.","err")}
+});
+
+/* ---------- tabs & init ---------- */
+function showTab(t){
+  ["form","list","recap"].forEach(function(x){$("tab-"+x).hidden=(x!==t)});
+  Array.prototype.forEach.call($("nav").children,function(b){b.classList.toggle("on",b.getAttribute("data-tab")===t)});
+  if(t==="list")renderList();if(t==="recap")renderRecap();
+}
+$("nav").addEventListener("click",function(e){var b=e.target.closest("button");if(b)showTab(b.getAttribute("data-tab"))});
+function renderAll(){
+  if(editing===null)$("idShow").textContent=nextId();
+  renderList();renderRecap();
+}
+
+opts($("kategori"),KATEGORI);opts($("prioritas"),PRIORITAS);opts($("status"),STATUS);
+opts($("fStatus"),STATUS,"Semua status");opts($("fPrio"),PRIORITAS,"Semua prioritas");opts($("fKat"),KATEGORI,"Semua kategori");
+cases=lsGet();   // shown until shared storage answers
+resetForm();renderAll();
+$("banner").innerHTML='<div class="banner">Menghubungkan ke penyimpanan bersama…</div>';
+
+(async function(){
+  try{downloads=await claude.use("downloads")}catch(e){downloads=null}
+  try{db=await claude.use("db")}catch(e){db=null}
+  if(!db){
+    $("banner").innerHTML='<div class="banner">Mode lokal: data hanya tersimpan di browser ini dan tidak terlihat oleh orang lain.</div>';
+    return;
+  }
+  col=db.collection("cases");
+  cases=[];
+  var got=false,timer=setTimeout(function(){if(!got)$("banner").innerHTML='<div class="banner">Data belum termuat. Periksa koneksi, lalu buka ulang halaman.</div>'},10000);
+  col.onSnapshot(function(snap){
+    got=true;clearTimeout(timer);$("banner").innerHTML="";
+    cases=docsOf(snap);renderAll();
+  },function(err){
+    got=true;clearTimeout(timer);
+    $("banner").innerHTML='<div class="banner">Gagal membaca data bersama'+(err&&err.message?": "+esc(err.message):"")+'.</div>';
+  });
+})();
+</script>
+</body>
+</html>
+
+      <select id="fKat"></select>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>ID</th><th>Tanggal</th><th>Judul issue</th><th>Kategori</th><th>Prioritas</th><th>Status</th><th>PIC</th><th>Pelanggan</th><th>Target</th><th>Umur (hari)</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <div class="detail" id="listCount" style="margin-top:8px"></div>
+  </section>
+
+  <section id="tab-recap" hidden>
+    <div class="row" style="margin-bottom:14px">
+      <button class="btn pri" id="xlsBtn">Download Excel (.xlsx)</button>
+      <button class="btn" id="copyBtn">Salin tabel (tempel ke Excel)</button>
+      <span class="msg" id="recapMsg"></span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="dist" id="dist"></div>
+  </section>
+</main>
+
+ze:12px;white-space:nowrap;background:var(--soft)}
+.p-Kritis{background:#fbd9d5;color:#8a1f16}.p-Tinggi{background:#fde3c8;color:#8a4a07}.p-Sedang{background:#fbf0c2;color:#7a6200}.p-Rendah{background:#d6f0e0;color:#14663d}
+.s-Selesai,.s-Ditutup{background:#d6f0e0;color:#14663d}.s-Dalam{background:#d9e6fb;color:#1a4a9c}.s-Menunggu{background:#fbf0c2;color:#7a6200}
+@media (prefers-color-scheme:dark){
+ .p-Kritis{background:#4a1f1b;color:#ffb3aa}.p-Tinggi{background:#4a3016;color:#ffc58a}.p-Sedang{background:#40380f;color:#f2dc7a}.p-Rendah{background:#173a28;color:#8fe0b3}
+ .s-Selesai,.s-Ditutup{background:#173a28;color:#8fe0b3}.s-Dalam{background:#1b2e4d;color:#a9c8ff}.s-Menunggu{background:#40380f;color:#f2dc7a}
+}
+.late{color:var(--bad);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi b{display:block;font-size:26px;line-height:1.2}
+.kpi span{font-size:12px;color:var(--mut)}
+.dist{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.bar{display:grid;grid-template-columns:150px 1fr 34px;gap:8px;align-items:center;margin:5px 0;font-size:13px}
+.bar i{display:block;height:10px;background:var(--accent);border-radius:5px;min-width:2px}
+.bar span:last-child{text-align:right;color:var(--mut)}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+.detail{font-size:12px;color:var(--mut);margin-top:2px}
+</style>
+</head>
