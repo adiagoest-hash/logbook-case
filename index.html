@@ -1,4 +1,3 @@
-TEST<b>&</b>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -51,7 +50,27 @@ th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;verti
 th{font-size:12px;color:var(--mut);background:var(--soft);position:sticky;top:0;white-space:nowrap}
 tbody tr{cursor:pointer}tbody tr:hover{background:var(--soft)}
 td.t{min-width:220px}
-.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-si<body>
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;white-space:nowrap;background:var(--soft)}
+.p-Kritis{background:#fbd9d5;color:#8a1f16}.p-Tinggi{background:#fde3c8;color:#8a4a07}.p-Sedang{background:#fbf0c2;color:#7a6200}.p-Rendah{background:#d6f0e0;color:#14663d}
+.s-Selesai,.s-Ditutup{background:#d6f0e0;color:#14663d}.s-Dalam{background:#d9e6fb;color:#1a4a9c}.s-Menunggu{background:#fbf0c2;color:#7a6200}
+@media (prefers-color-scheme:dark){
+ .p-Kritis{background:#4a1f1b;color:#ffb3aa}.p-Tinggi{background:#4a3016;color:#ffc58a}.p-Sedang{background:#40380f;color:#f2dc7a}.p-Rendah{background:#173a28;color:#8fe0b3}
+ .s-Selesai,.s-Ditutup{background:#173a28;color:#8fe0b3}.s-Dalam{background:#1b2e4d;color:#a9c8ff}.s-Menunggu{background:#40380f;color:#f2dc7a}
+}
+.late{color:var(--bad);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi b{display:block;font-size:26px;line-height:1.2}
+.kpi span{font-size:12px;color:var(--mut)}
+.dist{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.bar{display:grid;grid-template-columns:150px 1fr 34px;gap:8px;align-items:center;margin:5px 0;font-size:13px}
+.bar i{display:block;height:10px;background:var(--accent);border-radius:5px;min-width:2px}
+.bar span:last-child{text-align:right;color:var(--mut)}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+.detail{font-size:12px;color:var(--mut);margin-top:2px}
+</style>
+</head>
+<body>
 <header>
   <h1>Logbook Issue / Case</h1>
   <div class="sub">Catat, pantau, dan rekap issue atau case pelanggan dalam satu tempat.</div>
@@ -106,7 +125,28 @@ td.t{min-width:220px}
     <div class="tools">
       <input id="q" type="search" placeholder="Cari judul, pelanggan, PICâ€¦">
       <select id="fStatus"></select>
-      <select id="fPrio"></select><script>
+      <select id="fPrio"></select>
+      <select id="fKat"></select>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>ID</th><th>Tanggal</th><th>Judul issue</th><th>Kategori</th><th>Prioritas</th><th>Status</th><th>PIC</th><th>Pelanggan</th><th>Target</th><th>Umur (hari)</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <div class="detail" id="listCount" style="margin-top:8px"></div>
+  </section>
+
+  <section id="tab-recap" hidden>
+    <div class="row" style="margin-bottom:14px">
+      <button class="btn pri" id="xlsBtn">Download Excel (.xlsx)</button>
+      <button class="btn" id="copyBtn">Salin tabel (tempel ke Excel)</button>
+      <span class="msg" id="recapMsg"></span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="dist" id="dist"></div>
+  </section>
+</main>
+
+<script>
 "use strict";
 var KATEGORI=["Stock/ Supply","Pengiriman/ Delivery","Kualitas Produk","Losses","Harga/ Komersial","Pembayaran/ Invoice","Kontrak/ Dokumen","Keluhan Pelanggan","Lainnya"];
 var PRIORITAS=["Rendah","Sedang","Tinggi","Kritis"];
@@ -348,44 +388,3 @@ $("banner").innerHTML='<div class="banner">Menghubungkan ke penyimpanan bersamaâ
 </script>
 </body>
 </html>
-
-      <select id="fKat"></select>
-    </div>
-    <div class="tablewrap"><table>
-      <thead><tr><th>ID</th><th>Tanggal</th><th>Judul issue</th><th>Kategori</th><th>Prioritas</th><th>Status</th><th>PIC</th><th>Pelanggan</th><th>Target</th><th>Umur (hari)</th></tr></thead>
-      <tbody id="tbody"></tbody>
-    </table></div>
-    <div class="detail" id="listCount" style="margin-top:8px"></div>
-  </section>
-
-  <section id="tab-recap" hidden>
-    <div class="row" style="margin-bottom:14px">
-      <button class="btn pri" id="xlsBtn">Download Excel (.xlsx)</button>
-      <button class="btn" id="copyBtn">Salin tabel (tempel ke Excel)</button>
-      <span class="msg" id="recapMsg"></span>
-    </div>
-    <div class="kpis" id="kpis"></div>
-    <div class="dist" id="dist"></div>
-  </section>
-</main>
-
-ze:12px;white-space:nowrap;background:var(--soft)}
-.p-Kritis{background:#fbd9d5;color:#8a1f16}.p-Tinggi{background:#fde3c8;color:#8a4a07}.p-Sedang{background:#fbf0c2;color:#7a6200}.p-Rendah{background:#d6f0e0;color:#14663d}
-.s-Selesai,.s-Ditutup{background:#d6f0e0;color:#14663d}.s-Dalam{background:#d9e6fb;color:#1a4a9c}.s-Menunggu{background:#fbf0c2;color:#7a6200}
-@media (prefers-color-scheme:dark){
- .p-Kritis{background:#4a1f1b;color:#ffb3aa}.p-Tinggi{background:#4a3016;color:#ffc58a}.p-Sedang{background:#40380f;color:#f2dc7a}.p-Rendah{background:#173a28;color:#8fe0b3}
- .s-Selesai,.s-Ditutup{background:#173a28;color:#8fe0b3}.s-Dalam{background:#1b2e4d;color:#a9c8ff}.s-Menunggu{background:#40380f;color:#f2dc7a}
-}
-.late{color:var(--bad);font-weight:600}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-.kpi b{display:block;font-size:26px;line-height:1.2}
-.kpi span{font-size:12px;color:var(--mut)}
-.dist{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-.bar{display:grid;grid-template-columns:150px 1fr 34px;gap:8px;align-items:center;margin:5px 0;font-size:13px}
-.bar i{display:block;height:10px;background:var(--accent);border-radius:5px;min-width:2px}
-.bar span:last-child{text-align:right;color:var(--mut)}
-.empty{padding:28px;text-align:center;color:var(--mut)}
-.detail{font-size:12px;color:var(--mut);margin-top:2px}
-</style>
-</head>
